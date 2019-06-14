@@ -115,7 +115,7 @@ public class MessageController {
 				logger.error("Incoming messageId is not the same as the messageId from the message to be modified");
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
-			Message updatedMessage = messageService.updateMessage( message);	
+			Message updatedMessage = messageService.updateMessage(message);	
 			logger.info("Message Updated!");
 			return new ResponseEntity<Message>(updatedMessage, HttpStatus.OK);
 		} catch(MessageNotFoundException ex) {

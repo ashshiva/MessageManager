@@ -2,10 +2,6 @@
 MMHOST="http://localhost:8080"
 unset ACTION MESSAGE ID
 
-command_exists() {
-    command -v $1 >/dev/null 2>&1
-}
-
 print_help() {
     echo "usage: mmcli [OPTIONS]
    Options:
@@ -18,12 +14,12 @@ print_help() {
                 [delete]   Deletes a message with a given id (example: mmcli -a delete -i 1).
                 [listall]  Lists all the messages (example: mmcli -a listall).
    -m          Message to be passed to MessageManager web app. Only needed for 'create' and 'update' actions.
-   -i          Message id to be passed to MessageManager web app. Only needed for 'get' and 'delete' actions.
+   -i          Message id to be passed to MessageManager web app. Only needed for 'get', 'update' and 'delete' actions.
    "
 }
 
 preflight_check() {
-    if [ -x "$(command_exists -v curl)" ] ; then
+    if [ -z "$(command -v curl)" ] ; then
         echo "error: Missing 'curl'. Please install 'curl' and try again."
         exit;
     fi
@@ -35,11 +31,19 @@ listall() {
 }
 
 get() {
+    if [ -z "$ID" ]; then 
+        echo "error: Please provide a message id to retrieve"
+        exit 1 
+    fi
     echo "Host: $MMHOST - Getting message with ID: $ID"
     curl -X GET --header 'Accept: application/json' "$MMHOST/api/v1/messages/$ID"
 }
 
 create() {
+    if [ -z "$MESSAGE" ]; then 
+        echo "error: Please provide a message string"
+        exit 1 
+    fi
     DATA='{
     "message": "'$MESSAGE'"
     }'
@@ -48,6 +52,14 @@ create() {
 }
 
 update() {
+    if [ -z "$ID" ]; then 
+        echo "error: Please provide a message id to update"
+        exit 1 
+    fi
+    if [ -z "$MESSAGE" ]; then 
+        echo "error: Please provide a message string"
+        exit 1 
+    fi
     DATA='{ 
     "id": '$ID', 
     "message": "'$MESSAGE'"
@@ -57,6 +69,10 @@ update() {
 }
 
 delete() {
+    if [ -z "$ID" ]; then 
+        echo "error: Please provide a message id to delete"
+        exit 1 
+    fi
     echo "Host: $MMHOST - Deleting message with id: $ID"
     curl -X DELETE --header 'Accept: */*' "$MMHOST/api/v1/messages/$ID"
 }
@@ -88,42 +104,10 @@ while getopts "hH:a:m:i:" opt; do
 done
 
 case $ACTION in
-    create)
-      if [ -z "$MESSAGE" ]; then 
-          echo "error: Please provide a message string"
-          exit 1 
-      fi
-      create
+    create|get|update|delete|listall)
+      $ACTION
       ;;
-    get)
-      if [ -z "$ID" ]; then 
-          echo "error: Please provide a message id to retrieve"
-          exit 1 
-      fi
-      get
-      ;;
-    update)
-      if [ -z "$ID" ]; then 
-          echo "error: Please provide a message id to update"
-          exit 1 
-      fi
-      if [ -z "$MESSAGE" ]; then 
-          echo "error: Please provide a message string"
-          exit 1 
-      fi
-      update
-      ;;
-    delete)
-      if [ -z "$ID" ]; then 
-          echo "error: Please provide a message id to delete"
-          exit 1 
-      fi
-      delete
-      ;;
-    listall)
-      listall
-      ;;
-    \?)
+    *)
       echo "error: Invalid action"
       exit 1
       ;;

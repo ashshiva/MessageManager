@@ -9,6 +9,8 @@ import javax.persistence.EntityNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.project.messagemanager.entity.Message;
@@ -79,7 +81,7 @@ public class MessageServiceImpl implements MessageService {
 		this.validateId(updatedMessage.getId());
 		
 		// just for validation
-		if(this.getMessage(updatedMessage.getId()) == null) {
+		if(updatedMessage.getMessage() == null) {
 			logger.error("Message is null");
 			throw new MessageNotFoundException("Message is null");
 		}
