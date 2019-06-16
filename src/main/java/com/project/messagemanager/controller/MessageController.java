@@ -2,6 +2,7 @@ package com.project.messagemanager.controller;
 
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.EmptyMessageException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.exceptions.UnknownException;
 import com.project.messagemanager.service.MessageService;
@@ -52,7 +54,7 @@ public class MessageController {
 		return new ResponseEntity<List<Message>>(messages, HttpStatus.OK);
 		} catch(Exception ex) {
 			logger.error("An unknown exception occurred: "+ex);
-			throw new UnknownException("An unknown exception occurred: ",ex);
+			throw new UnknownException();
 		}
 	}
 	
@@ -68,14 +70,14 @@ public class MessageController {
 			Message message = messageService.getMessage(messageId);
 			logger.info("Specific message retrieved!");
 			if(message == null || message.getId() == null)
-				throw new MessageNotFoundException("Message not found!");
+				throw new MessageNotFoundException();
 			return new ResponseEntity<Message>(message, HttpStatus.OK);
 		} catch(MessageNotFoundException ex) {
 			logger.error("MessageNotFoundException occurred: "+ex);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);		
 		} catch(Exception ex) {
 			logger.error("An unknown exception occurred: "+ex);
-			throw new UnknownException("An unknown exception occurred: ",ex);
+			throw new UnknownException();
 		}
 	}
 	
@@ -90,13 +92,17 @@ public class MessageController {
 			throws MethodArgumentNotValidException {
 		logger.info("Saving messsage...");
 		try {
-		Message savedMessage = messageService.saveMessage(message);
-		logger.info("Message created!");
-		return new ResponseEntity<Message>(savedMessage, HttpStatus.CREATED);
+			Message savedMessage = messageService.saveMessage(message);
+			logger.info("Message created!");
+			return new ResponseEntity<Message>(savedMessage, HttpStatus.CREATED);
+		} catch(EmptyMessageException ex) {
+			logger.error("Message is null! "+ex);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch(Exception ex) {
 			logger.error("An unknown exception occurred: "+ex);
-			throw new UnknownException("An unknown exception occurred: ",ex);
+			throw new UnknownException();
 		}
+		
 	}
 	
 	@RequestMapping(
@@ -121,9 +127,12 @@ public class MessageController {
 		} catch(MessageNotFoundException ex) {
 			logger.error("Message not found: "+ex);
 			return new ResponseEntity<Message>(HttpStatus.NOT_FOUND);		
-		} catch(Exception ex) {
+		} catch(EmptyMessageException ex) {
+			logger.error("Message is null/blank: "+ex);
+			return new ResponseEntity<Message>(HttpStatus.BAD_REQUEST);	
+		}catch(Exception ex) {
 			logger.error("An unknown exception occurred: "+ex);
-			throw new UnknownException("An unknown exception occurred: ",ex);
+			throw new UnknownException();
 		}
 	}
 	
@@ -138,27 +147,26 @@ public class MessageController {
 			messageService.deleteMessage(messageId);
 			logger.info("Message deleted!");
 			return new ResponseEntity<Message>(HttpStatus.OK);
-		}  catch(MessageNotFoundException ex) {
+		} catch(MessageNotFoundException ex) {
 			logger.error("Message not found: "+ex);
 			return new ResponseEntity<Message>(HttpStatus.NOT_FOUND);			
+		} catch(ConstraintViolationException ex) {
+			logger.error("Invalid message id supplied: "+ex);
+			return new ResponseEntity<Message>(HttpStatus.BAD_REQUEST);
 		} catch(Exception ex) {
 			logger.error("An unknown exception occurred: ",ex);
-			throw new UnknownException("An unknown exception occurred: ",ex);
+			throw new UnknownException();
 		}	
 	}
 	
 	// TODO: 
-	// dockerize app
-	// switch to mysql database
-	// add annotations to entity, every property.
-	// add everything into git
-	// tests
-	// build executable jar
-	// build CLI
-	// pagination
-	// hide 'isPalindrome' field in create/update() but show it in 'get'
-	// README file
-
+	// README  
+	
+	// tests - DONE
+	// build CLI - DONE
+	// add annotations to entity, every property.- DONE
+	// add everything into git - DONE
+	// dockerize app - DONE
 	// implement hashcode() serialUID on top of every class - did not implement hashcode(), but did include seriaUID.-  DONE
 	// design patterns - DONE
 	// handle validations - DONE

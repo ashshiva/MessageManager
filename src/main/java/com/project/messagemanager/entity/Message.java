@@ -10,6 +10,11 @@ import javax.validation.constraints.NotEmpty;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.project.messagemanager.exceptions.EmptyMessageException;
+import com.project.messagemanager.exceptions.MessageNotFoundException;
 
 @Entity
 @Table(name="MESSAGE")
@@ -31,7 +36,7 @@ public class Message {
 	@Column(name="ISPALINDROME")
 	private Boolean isPalindrome;
 	
-	public Message(String message, Boolean isPalindrome) {
+	public Message(String message) {
 		super();
 		this.message = message;
 		this.isPalindrome = checkPalindrome(message);
@@ -51,7 +56,7 @@ public class Message {
 		return message;
 	}
 	
-	public void setMessage(String message) {
+	public void setMessage(String message) throws EmptyMessageException{
 		this.isPalindrome = checkPalindrome(message);
 		this.message = message;
 	}
@@ -66,9 +71,12 @@ public class Message {
     }
 	
 	// check if message is a palindrome
-	public boolean checkPalindrome(String message) {
-		String reversedMessage = new StringBuffer(message.toLowerCase()).reverse().toString();
-		logger.info("Original String: {}, Reversed String: {}", message, reversedMessage);
-		return reversedMessage.equals(message.toLowerCase());
+	private boolean checkPalindrome(String message) {
+		if(message != null && !message.trim().isEmpty()) {
+			String reversedMessage = new StringBuffer(message.toLowerCase()).reverse().toString();
+			logger.info("Original String: {}, Reversed String: {}", message, reversedMessage);
+			return reversedMessage.equals(message.toLowerCase());
+		}
+		return false;
 	}
 }

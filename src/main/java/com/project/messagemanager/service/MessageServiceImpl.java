@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.EmptyMessageException;
 import com.project.messagemanager.exceptions.InvalidIdException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.exceptions.UnknownException;
@@ -38,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
 			logger.info("Retrieved messages!");
 		} catch(Exception ex) {
 			logger.catching(ex);
-			throw new UnknownException("An unknown exception occurred: ",ex);
+			throw new UnknownException();
 		}
 		return messages;
 	}
@@ -55,19 +56,19 @@ public class MessageServiceImpl implements MessageService {
 				logger.info("Found message!");
 			}
 		} catch(NoSuchElementException ex) {
-			logger.catching(ex);
-			throw new MessageNotFoundException("Message not found!", ex);
+			logger.error("MessageNot found! "+ex);
+			throw new MessageNotFoundException();
 		}
 		return message;
 	}
 
 	@Override
-	public Message saveMessage(Message message) throws Exception {
+	public Message saveMessage(Message message) throws EmptyMessageException {
 		logger.info("Creating message...");
 		
-		if(message.getMessage() == null) {
+		if(message == null || message.getMessage() == null || message.getMessage().trim().isEmpty()) {
 			logger.error("Message is null");
-			throw new MessageNotFoundException("Message is null");
+			throw new EmptyMessageException();
 		}
 		
 		Message createdMessage = messageRepository.save(message);	
@@ -76,14 +77,14 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	@Override
-	public Message updateMessage(Message updatedMessage) throws MessageNotFoundException {
+	public Message updateMessage(Message updatedMessage) throws MessageNotFoundException, EmptyMessageException {
 		logger.info("Updating message...");
 		this.validateId(updatedMessage.getId());
 		
 		// just for validation
 		if(updatedMessage.getMessage() == null) {
 			logger.error("Message is null");
-			throw new MessageNotFoundException("Message is null");
+			throw new EmptyMessageException();
 		}
 		
 		updatedMessage = messageRepository.save(updatedMessage);
@@ -100,7 +101,7 @@ public class MessageServiceImpl implements MessageService {
 		
 		if(message == null) {
 			logger.error("Message is null");
-			throw new MessageNotFoundException("Message is null");
+			throw new MessageNotFoundException();
 		}
 		
 		messageRepository.deleteById(id);
