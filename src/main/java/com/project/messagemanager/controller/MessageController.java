@@ -158,28 +158,4 @@ public class MessageController {
 			throw new UnknownException();
 		}	
 	}
-	
-	// TODO: 
-	// README  
-	
-	// tests - DONE
-	// build CLI - DONE
-	// add annotations to entity, every property.- DONE
-	// add everything into git - DONE
-	// dockerize app - DONE
-	// implement hashcode() serialUID on top of every class - did not implement hashcode(), but did include seriaUID.-  DONE
-	// design patterns - DONE
-	// handle validations - DONE
-	// exception handling - DONE
-	// id datatype? make UUID - made Integer, decided not to go with UUID - DONE
-	// find out why <Message, Integer> in respository code syntax, how to write it for composite primary keys - DONE
-	// return object in create/update/delete flow - DONE
-	// palindrome logic - DONE
-	// api versioning - /api/v1/  - DONE
-	// change 'find' in method names  to 'get' - DONE
-	// enable swagger; check latest version. - DONE
-	// logger to log messages.. - DONE
-	// produces= application/json, consumes=application/json  - DONE
-	// fix palindrome logic - DONE
-	// try to combine save/update calls in service class - DONE
 }
