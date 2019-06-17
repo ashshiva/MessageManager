@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 import com.project.messagemanager.exceptions.EmptyMessageException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
@@ -72,11 +73,20 @@ public class Message {
 	
 	// check if message is a palindrome
 	private boolean checkPalindrome(String message) {
+		boolean isPalindrome = false;
+		
 		if(message != null && !message.trim().isEmpty()) {
-			String reversedMessage = new StringBuffer(message.toLowerCase()).reverse().toString();
-			logger.info("Original String: {}, Reversed String: {}", message, reversedMessage);
-			return reversedMessage.equals(message.toLowerCase());
+			if(StringUtils.containsWhitespace(message)) {
+				System.out.println("\""+message+"\""+ " Contains whitespace");
+				
+				// strip all whitespaces, compute reversed message and then compare with original message 
+				// after stripping original message of whitespaces as well
+				String reversedMessage = new StringBuffer(StringUtils.trimAllWhitespace(message).toLowerCase()).reverse().toString();
+				logger.info("Original String: {}, Reversed String: {}", message, reversedMessage);
+				isPalindrome = reversedMessage.equals(StringUtils.trimAllWhitespace(message).toLowerCase());
+			}
 		}
-		return false;
+		// if message is null, return false anyway
+		return isPalindrome;
 	}
 }

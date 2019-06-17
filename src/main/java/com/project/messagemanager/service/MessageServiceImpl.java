@@ -82,7 +82,7 @@ public class MessageServiceImpl implements MessageService {
 		this.validateId(updatedMessage.getId());
 		
 		// just for validation
-		if(updatedMessage.getMessage() == null) {
+		if(updatedMessage.getMessage() == null || updatedMessage.getMessage().isEmpty()) {
 			logger.error("Message is null");
 			throw new EmptyMessageException();
 		}
