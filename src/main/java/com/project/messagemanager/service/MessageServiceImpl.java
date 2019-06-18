@@ -38,7 +38,7 @@ public class MessageServiceImpl implements MessageService {
 			messages = messageRepository.findAll();
 			logger.info("Retrieved messages!");
 		} catch(Exception ex) {
-			logger.catching(ex);
+			logger.error("An unknown exception occurred: "+ex);
 			throw new UnknownException();
 		}
 		return messages;
@@ -109,7 +109,10 @@ public class MessageServiceImpl implements MessageService {
 	}
 	
 	public void validateId(Integer id) throws InvalidIdException {
-		if(id == null || id <= 0) throw new InvalidIdException("Message Id is invalid or null");
+		if(id == null || id <= 0) { 
+			logger.error("Message id is either null or negative");
+			throw new InvalidIdException("Message Id is invalid or null");
+		}
 	}
 
 }
