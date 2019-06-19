@@ -1,5 +1,7 @@
 package com.project.messagemanager.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +12,11 @@ import javax.validation.constraints.NotEmpty;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.util.StringUtils;
+
+import com.project.messagemanager.exceptions.EmptyMessageException;
 
 @Entity
 @Table(name="MESSAGE")
@@ -31,7 +38,15 @@ public class Message {
 	@Column(name="ISPALINDROME")
 	private Boolean isPalindrome;
 	
-	public Message(String message, Boolean isPalindrome) {
+	@CreationTimestamp
+	@Column(name="CREATEDATE", updatable=false)
+	private Date createdAt;
+	
+	@UpdateTimestamp
+	@Column(name="MODIFIEDDATE")
+	private Date updatedAt;
+	
+	public Message(String message) {
 		super();
 		this.message = message;
 		this.isPalindrome = checkPalindrome(message);
@@ -39,10 +54,18 @@ public class Message {
 	
 	protected Message() {}
 	
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public Date getUpdatedAt() {
+		return updatedAt;
+	}
+	
 	public Integer getId() {
 		return id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -51,7 +74,7 @@ public class Message {
 		return message;
 	}
 	
-	public void setMessage(String message) {
+	public void setMessage(String message) throws EmptyMessageException{
 		this.isPalindrome = checkPalindrome(message);
 		this.message = message;
 	}
@@ -66,9 +89,21 @@ public class Message {
     }
 	
 	// check if message is a palindrome
-	public boolean checkPalindrome(String message) {
-		String reversedMessage = new StringBuffer(message.toLowerCase()).reverse().toString();
-		logger.info("Original String: {}, Reversed String: {}", message, reversedMessage);
-		return reversedMessage.equals(message.toLowerCase());
+	private boolean checkPalindrome(String message) {
+		boolean isPalindrome = false;
+		
+		if(message != null && !message.trim().isEmpty()) {
+			if(StringUtils.containsWhitespace(message)) {
+				System.out.println("\""+message+"\""+ " Contains whitespace");
+				
+				// strip all whitespaces, compute reversed message and then compare with original message 
+				// after stripping original message of whitespaces as well
+				String reversedMessage = new StringBuffer(StringUtils.trimAllWhitespace(message).toLowerCase()).reverse().toString();
+				logger.info("Original String: {}, Reversed String: {}", message, reversedMessage);
+				isPalindrome = reversedMessage.equals(StringUtils.trimAllWhitespace(message).toLowerCase());
+			}
+		}
+		// if message is null, return false anyway
+		return isPalindrome;
 	}
 }

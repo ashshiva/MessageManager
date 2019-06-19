@@ -9,9 +9,12 @@ import javax.persistence.EntityNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.EmptyMessageException;
 import com.project.messagemanager.exceptions.InvalidIdException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.exceptions.UnknownException;
@@ -35,8 +38,8 @@ public class MessageServiceImpl implements MessageService {
 			messages = messageRepository.findAll();
 			logger.info("Retrieved messages!");
 		} catch(Exception ex) {
-			logger.catching(ex);
-			throw new UnknownException("An unknown exception occurred: ",ex);
+			logger.error("An unknown exception occurred: "+ex);
+			throw new UnknownException();
 		}
 		return messages;
 	}
@@ -53,19 +56,19 @@ public class MessageServiceImpl implements MessageService {
 				logger.info("Found message!");
 			}
 		} catch(NoSuchElementException ex) {
-			logger.catching(ex);
-			throw new MessageNotFoundException("Message not found!", ex);
+			logger.error("MessageNot found! "+ex);
+			throw new MessageNotFoundException();
 		}
 		return message;
 	}
 
 	@Override
-	public Message saveMessage(Message message) throws Exception {
+	public Message saveMessage(Message message) throws EmptyMessageException {
 		logger.info("Creating message...");
 		
-		if(message.getMessage() == null) {
+		if(message == null || message.getMessage() == null || message.getMessage().trim().isEmpty()) {
 			logger.error("Message is null");
-			throw new MessageNotFoundException("Message is null");
+			throw new EmptyMessageException();
 		}
 		
 		Message createdMessage = messageRepository.save(message);	
@@ -74,14 +77,14 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	@Override
-	public Message updateMessage(Message updatedMessage) throws MessageNotFoundException {
+	public Message updateMessage(Message updatedMessage) throws MessageNotFoundException, EmptyMessageException {
 		logger.info("Updating message...");
 		this.validateId(updatedMessage.getId());
 		
 		// just for validation
-		if(this.getMessage(updatedMessage.getId()) == null) {
+		if(updatedMessage.getMessage() == null || updatedMessage.getMessage().isEmpty()) {
 			logger.error("Message is null");
-			throw new MessageNotFoundException("Message is null");
+			throw new EmptyMessageException();
 		}
 		
 		updatedMessage = messageRepository.save(updatedMessage);
@@ -98,7 +101,7 @@ public class MessageServiceImpl implements MessageService {
 		
 		if(message == null) {
 			logger.error("Message is null");
-			throw new MessageNotFoundException("Message is null");
+			throw new MessageNotFoundException();
 		}
 		
 		messageRepository.deleteById(id);
@@ -106,7 +109,10 @@ public class MessageServiceImpl implements MessageService {
 	}
 	
 	public void validateId(Integer id) throws InvalidIdException {
-		if(id == null || id <= 0) throw new InvalidIdException("Message Id is invalid or null");
+		if(id == null || id <= 0) { 
+			logger.error("Message id is either null or negative");
+			throw new InvalidIdException("Message Id is invalid or null");
+		}
 	}
 
 }

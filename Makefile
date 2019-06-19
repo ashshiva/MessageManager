@@ -20,3 +20,11 @@ docker-run:
 	docker image prune -f
 	docker run --rm -p $(port):8080 message-manager:$(version)
 	
+test:
+	$(gradle) test
+	
+javadoc:
+	$(gradle) javadoc
+	
+jacoco: 
+	$(gradle) test jacocoTestReport		
