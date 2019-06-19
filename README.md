@@ -120,7 +120,10 @@ The generated javadocs can be found in this location:
 `build/docs/javadoc/index.html`
 
 ## Continuous Integration
-Github Repository is integrated with CircleCI to run tests with commit to the master branch.
+Github Repository is integrated with CircleCI to run tests, build Docker container image and push to Dockerhub on the master branch.
+
+Here is a recent snapshot of the CircleCI page, with the workflow described above.
+![](images/CircleCI.png)
 
 ## Future Action items
 - Support MySQL / PostgreSQL for long-term storage
