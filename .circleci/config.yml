@@ -33,24 +33,15 @@ jobs:
           name: Build Docker image
           command: |
             docker build --build-arg version=1.0.0 -t $IMAGE_NAME:${CIRCLE_SHA1} .
-            docker tag $IMAGE_NAME:${CIRCLE_SHA1} $IMAGE_NAME:latest 
-  publish-docker:
-    environment:
-      IMAGE_NAME: ashwathisshiva/messagemanager
-    docker:
-      - image: circleci/buildpack-deps:stretch
-    steps:
-      - setup_remote_docker
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
+            docker tag $IMAGE_NAME:${CIRCLE_SHA1} $IMAGE_NAME:latest
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:${CIRCLE_SHA1}
             docker push $IMAGE_NAME:latest
+            docker logout
 
 workflows:
   version: 2
-  build:
+  build-and-push-messagemanager:
     jobs:
       - build-test:
           filters:
@@ -59,12 +50,6 @@ workflows:
       - docker-build:
           requires:
             - build-test
-          filters:
-            branches:
-              only: master
-      - publish-docker:
-          requires:
-            - docker-build
           filters:
             branches:
               only: master
