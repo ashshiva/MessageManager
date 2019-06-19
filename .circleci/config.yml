@@ -1,42 +1,70 @@
-# Java Gradle CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
-#
 version: 2
 jobs:
-  build:
+  build-test:
     docker:
-      # specify the version you desire here
       - image: circleci/openjdk:8-jdk
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
     working_directory: ~/repo
-
     environment:
-      # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-
     steps:
       - checkout
-
       # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
       - run: gradle dependencies
-
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-
-      # run tests!
       - run: gradle test
+  docker-build:
+    environment:
+      IMAGE_NAME: ashwathisshiva/messagemanager
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t $IMAGE_NAME:${CIRCLE_SHA1} .
+            docker tag $IMAGE_NAME:${CIRCLE_SHA1} $IMAGE_NAME:latest 
+  publish-docker:
+    environment:
+      IMAGE_NAME: building-on-ci
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker push $IMAGE_NAME:${CIRCLE_SHA1}
+            docker push $IMAGE_NAME:latest
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-test:
+          filters:
+            branches:
+              only: master
+      - docker-build:
+          requires:
+            - build-test
+          filters:
+            branches:
+              only: master
+      - publish-docker:
+          requires:
+            - docker-build
+          filters:
+            branches:
+              only: master
