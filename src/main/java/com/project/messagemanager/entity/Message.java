@@ -1,5 +1,7 @@
 package com.project.messagemanager.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,12 +12,11 @@ import javax.validation.constraints.NotEmpty;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.util.StringUtils;
 
 import com.project.messagemanager.exceptions.EmptyMessageException;
-import com.project.messagemanager.exceptions.MessageNotFoundException;
 
 @Entity
 @Table(name="MESSAGE")
@@ -37,6 +38,14 @@ public class Message {
 	@Column(name="ISPALINDROME")
 	private Boolean isPalindrome;
 	
+	@CreationTimestamp
+	@Column(name="CREATEDATE", updatable=false)
+	private Date createdAt;
+	
+	@UpdateTimestamp
+	@Column(name="MODIFIEDDATE")
+	private Date updatedAt;
+	
 	public Message(String message) {
 		super();
 		this.message = message;
@@ -45,10 +54,18 @@ public class Message {
 	
 	protected Message() {}
 	
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public Date getUpdatedAt() {
+		return updatedAt;
+	}
+	
 	public Integer getId() {
 		return id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
