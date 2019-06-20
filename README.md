@@ -6,9 +6,13 @@ MessageManager is an application that manages messages and provides details abou
 This application is implemented in Java as a Spring Boot application.
 
 ## Architecture
+I make use of the MVC model to build the MessageManager Service. Message makes up the model along with the service layer and repository integration. CLI terminal interface makes for our View. Controller and action methods accept incoming requests, route it to the appropriate service layer which in turn, access the Repository/Entity objects and thus interacts with the database. 
+
+The planned deployment architecture is depicted below:
+![](images/AWS.png)
 
 ## Supported Databases
-Currently the MessageManager application only supports H2, the embedded database that comes along with spring boot. We can plan to support other RDBMS like MySQL/PostgreSQL in future. Also, when we get there we can come up with a strategy to support migrations (using flyway or liquibase).
+Currently the MessageManager application only supports H2, the embedded database that comes along with spring boot. I can plan to support other RDBMS like MySQL/PostgreSQL in future. Also, I can come up with a strategy to support migrations (using flyway or liquibase) when I get there. 
 
 ## How to build and run the application
 A makefile is included to help build and run the application with ease.
@@ -45,7 +49,7 @@ make run version=1.0.0
 ```sh
 make run
 ```
-Now that the application is running, we can access it in the browser using: http://localhost:8080/swagger-ui.html
+Now that the application is running, you can access it in the browser using: http://localhost:8080/swagger-ui.html
 If you have overridden the default port, please update the port number accordingly.
 
 - To build the MessageManager application in to a Docker container image with a specific `version` using Docker buildkit (this is a multi-stage Docker build where the first stage builds the jar and second stage just runs the jar in a alpine jre base image to reduce the attack surface)
@@ -125,10 +129,18 @@ Github Repository is integrated with CircleCI to run tests, build Docker contain
 Here is a recent snapshot of the CircleCI page, with the workflow described above.
 ![](images/CircleCI.png)
 
+The built images are pushed to Dockerhub, and are made available here:
+`https://hub.docker.com/r/ashwathisshiva/messagemanager`
+
+If you want to give it a try, you can do so by running:
+```sh
+docker pull ashwathisshiva/messagemanager
+```
 ## Future Action items
 - Support MySQL / PostgreSQL for long-term storage
 - bring in migration strategies to manage schema changes using a system like liquibase
-- Confirm that the included commands above will work on Windows (with/without WSL).
+- Confirm that the included commands on Makefile/mmcli above will work on Windows (with/without WSL).
 - Incorporate soft-delete
+- Deploy to AWS by following the architecture depicted above.
 
 
