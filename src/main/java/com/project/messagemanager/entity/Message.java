@@ -91,7 +91,7 @@ public class Message {
 	
 	@Override
     public String toString() {
-       return "Message[id="+id+", message="+message+", isPalindrome="+isPalindrome+"]";
+       return "Message[Id="+id+", Message="+message+", isPalindrome="+isPalindrome+", CreatedAt="+createdAt+", UpdatedAt="+updatedAt+"]";
     }
 	
 	// check if message is a palindrome
@@ -99,17 +99,24 @@ public class Message {
 		boolean isPalindrome = false;
 		
 		if(message != null && !message.trim().isEmpty()) {
+			String reversedMessage = null;
+			String origMessage = null;
 			if(StringUtils.containsWhitespace(message)) {
-				System.out.println("\""+message+"\""+ " Contains whitespace");
-				
+				logger.info("\""+message+"\""+ " Contains whitespace");				
 				// strip all whitespaces, compute reversed message and then compare with original message 
 				// after stripping original message of whitespaces as well
-				String reversedMessage = new StringBuffer(StringUtils.trimAllWhitespace(message).toLowerCase()).reverse().toString();
-				logger.info("Original String: {}, Reversed String: {}", message, reversedMessage);
-				isPalindrome = reversedMessage.equals(StringUtils.trimAllWhitespace(message).toLowerCase());
+				origMessage = StringUtils.trimAllWhitespace(message).toLowerCase();
 			}
+			else {
+				logger.info("\""+message+"\""+ " does not contain whitespace");
+				origMessage = message.toLowerCase();
+			}
+			reversedMessage = new StringBuffer(origMessage).reverse().toString();
+			logger.info("Original String: {}, Reversed String: {}", message, reversedMessage);
+			isPalindrome = reversedMessage.equals(origMessage);
 		}
 		// if message is null, return false anyway
 		return isPalindrome;
 	}
+	
 }

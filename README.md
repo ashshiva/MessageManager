@@ -49,7 +49,7 @@ make run version=1.0.0
 ```sh
 make run
 ```
-Now that the application is running, you can access it in the browser using: http://localhost:8080/swagger-ui.html
+Now that the application is running, you can access it in the browser at: http://localhost:8080/swagger-ui.html
 If you have overridden the default port, please update the port number accordingly.
 
 - To build the MessageManager application in to a Docker container image with a specific `version` using Docker buildkit (this is a multi-stage Docker build where the first stage builds the jar and second stage just runs the jar in a alpine jre base image to reduce the attack surface)
@@ -78,10 +78,10 @@ make docker run version=1.0.0 port=9090
 ```sh
 make test
 ```
-You can observe the results generated as XML files at the location:
+You can observe the results generated as XML here:
 `build/test-results/test/` 
 
-To view the html test results, open the index.html file located at: `build/reports/tests/test/`
+To view the html test results, open the `index.html` file located at: `build/reports/tests/test/`
 
 - To run code coverage along with tests, run the following command in a terminal:
 ```sh
@@ -92,31 +92,38 @@ The code coverage report can be viewed at this location: `build/reports/jacoco/t
 XML report can be viewed here: `build/reports/jacoco/test/jacocoTestReport.xml`
 
 
-## How to test the application
-Once you have the MessageManager application up and running, you can access it using a browser by navigating to `http://localhost:8080/swagger-ui.html`. If you have overridden the default port, please update the port number accordingly.
-
-
 ## How to access the application
-There are 3 ways to access the application:
+There are 2 ways to run the application:
 
-- Since source code is included, you can just run the MessageManager application as a SpringBoot application and access the REST UI on: http://localhost:8080/swagger-ui.html in order to test it.
+- Since source code is included, you can just run the MessageManager application as a SpringBoot application directly or by using the provided `Makefile` and access the REST APIs.
+*Please note: You will need to have Java and gradle installed and their paths appropriately set in order to be able to go the above route.*
 
-- CLI - run the source code as a Spring Boot application and use the CLI we have implemented as a bash shell script to test the MessageManager applciation. There is help available as part of the CLI to test the REST APIs supported by MessageManager.
-To access help and get started, run the following command from the terminal from within the same cloned MessageManager directory:
-```sh
-./mmcli -h
-```
-*You will need to have Java and gradle installed and their paths appropriately set in order to be able to go the above two routes.*
+- docker - run the application in a docker container, which would have mapped the host port to the container port.
 
-- docker - run the application in a docker container, which would have mapped the host port to the container port and then access the REST UI on localhost as usual using: http://localhost:8080
+And 2 ways to access the running application:
+
+- To make it easier I have included Swagger UI which loads the swagger specification and provides a good UI which can be accessed here: http://localhost:8080/swagger-ui.html in order to test it. <br />
+*Please note: The included swagger UI will only work on `localhost`.*
+
+- CLI - use the CLI I have created as a bash shell script to test the MessageManager applciation. There is help available as part of the CLI to test the REST APIs supported by MessageManager application.<br />
+To access help and get started, run the following commands from the terminal from within the same cloned MessageManager directory:
+  ```sh
+  chmod +x mmcli.h
+  ```
+  ```sh
+  ./mmcli -h
+  ```
+
+
 
 ## Documentation
-REST API documentation is provided through swagger. Swagger UI is also included as a means to serve as documentation. Also, the code has inline comments to increase readability and understanding of the code.
+**REST API docs** - REST API documentation is provided through swagger. Included Swagger UI also serves as a documentation. Also, the code has inline comments to increase readability and understanding of the code.
 
 The swagger json spec can be accessed at `http://localhost:8080/v2/api-docs` and the swagger UI itself can be accessed at `http://localhost:8080/swagger-ui.html`
+
 If you have overriden the default port, please update the URL accordingly.
 
-Javadocs - Javadocs can be generated using the command:
+**Javadocs** - Javadocs can be generated using the command:
 ```sh
 make javadoc
 ```
@@ -124,7 +131,7 @@ The generated javadocs can be found in this location:
 `build/docs/javadoc/index.html`
 
 ## Continuous Integration
-Github Repository is integrated with CircleCI to run tests, build Docker container image and push to Dockerhub on the master branch.
+Github Repository is integrated with CircleCI to run tests, build Docker container image and push to Dockerhub on the master branch. The CircleCI configuration describing the CI workflow can be found at `.circleci/config.yml` .
 
 Here is a recent snapshot of the CircleCI page, with the workflow described above.
 ![](images/CircleCI.png)
@@ -139,7 +146,7 @@ docker pull ashwathisshiva/messagemanager
 ## Future Action items
 - Support MySQL / PostgreSQL for long-term storage
 - bring in migration strategies to manage schema changes using a system like liquibase
-- Confirm that the included commands on Makefile/mmcli above will work on Windows (with/without WSL).
+- Confirm that the included commands in the `Makefile` and `mmcli` above will work on Windows (with/without WSL).
 - Incorporate soft-delete
 - Deploy to AWS by following the architecture depicted above.
 

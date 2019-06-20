@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 */
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "No message supplied!")
-public class EmptyMessageException extends Exception{
+public class EmptyMessageException extends RuntimeException {
 	private static final long serialVersionUID = 597856383928495L;
 }

@@ -38,9 +38,9 @@ listall() {
         msg=${response:0:${#response}-3}
         len=$(echo $msg | jq '. | length')
         if [ "$len" -gt 0 ]; then
-            echo -e "ID\tIs palindrome\tMessage Content"
-            echo -e "---\t--------------\t----------------"
-            echo $msg | jq -r '.[] | "\(.id)\t\(.palindrome)\t\t\(.message)"'
+            echo -e "ID\tIs palindrome\tCreated At\t\t\tUpdated At\t\t\tMessage Content"
+            echo -e "---\t--------------\t-----------\t\t\t-------------\t\t\t-----------------"
+            echo $msg | jq -r '.[] | "\(.id)\t\(.palindrome)\t\t\(.createdAt)\t\(.updatedAt)\t\(.message)"'
         else
             echo "There are no messages to display"
         fi
@@ -61,6 +61,7 @@ get() {
         echo "Retrieved Message with ID: $ID"
         msg=${response:0:${#response}-3}
         echo "Message content: $(echo $msg | jq -r '.message'), Is palindrome: $(echo $msg | jq -r '.palindrome')"
+        echo "Created At: $(echo $msg | jq -r '.createdAt'), Updated At: $(echo $msg | jq -r '.updatedAt')"
     elif [ $resp_code == 404 ]; then
         echo "Message with the given id could not be found."
     elif [ $resp_code == 400 ]; then
@@ -86,6 +87,7 @@ create() {
         msg=${response:0:${#response}-3}
         echo "Successfully created message and it's id is: $(echo $msg | jq -r '.id')"
         echo "Message content: $(echo $msg | jq -r '.message'), Is palindrome: $(echo $msg | jq -r '.palindrome')"
+        echo "Created At: $(echo $msg | jq -r '.createdAt')"
     elif [ $resp_code == 400 ]; then
         echo "Unable to create the message. Please check the provided message."
     else 
@@ -114,6 +116,7 @@ update() {
         msg=${response:0:${#response}-3}
         echo "Successfully updated message with id: $ID"
         echo "Updated message content: $(echo $msg | jq -r '.message'), Is palindrome: $(echo $msg | jq -r '.palindrome')"
+        echo "Updated At: $(echo $msg | jq -r '.updatedAt')"
     elif [ $resp_code == 400 ]; then
         echo "Unable to update the message. Please check the provided id and message."
     elif [ $resp_code == 404 ]; then

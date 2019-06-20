@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.service.MessageService;
 
 /**
@@ -60,7 +61,7 @@ public class MessageControllerTest {
 	}
 
 	@Test
-	public void getMessageTest() throws Exception {
+	public void getMessageTest() throws Exception, MessageNotFoundException {
 		Message message = new Message("google");
 		message.setId(1);
 		
@@ -72,7 +73,7 @@ public class MessageControllerTest {
 	}
 	
 	@Test
-	public void getMessageInvalidTest() throws Exception {
+	public void getMessageInvalidTest() throws Exception, MessageNotFoundException {
 	    when(service.getMessage(1)).thenReturn(null);
 	    mvc.perform(get("/api/v1/messages/{messageId}", 1))
 	            .andExpect(status().isNotFound());
@@ -106,7 +107,7 @@ public class MessageControllerTest {
 	
 
 	@Test
-	public void deleteMessageSuccessTest() throws Exception {
+	public void deleteMessageSuccessTest() throws Exception, MessageNotFoundException {
 		
 		Message message = new Message("google");
 		message.setId(1);
@@ -118,7 +119,7 @@ public class MessageControllerTest {
 	}
 	
 	@Test
-	public void deleteMessageFailureTest() throws Exception {
+	public void deleteMessageFailureTest() throws Exception, MessageNotFoundException {
 		
 	    doNothing().when(service).deleteMessage(-1);
 		mvc.perform(delete("/api/v1/messages/{messageId}", -1)
@@ -127,7 +128,7 @@ public class MessageControllerTest {
 	}
 	
 	@Test
-	public void updateMessageSuccessTest() throws Exception {
+	public void updateMessageSuccessTest() throws Exception, MessageNotFoundException {
 		// creating and saving a message
 		String msg = "This world is awesome";
 		Message message = new Message(msg);
@@ -154,7 +155,7 @@ public class MessageControllerTest {
 	}
 	
 	@Test
-	public void updateMessageFailureInvalidIdTest() throws Exception {
+	public void updateMessageFailureInvalidIdTest() throws Exception, MessageNotFoundException {
 		// creating and saving a message
 		String msg = "This world is awesome";
 		Message message = new Message(msg);
@@ -179,7 +180,7 @@ public class MessageControllerTest {
 	}
 	
 	@Test
-	public void updateMessageFailureNullMessageTest() throws Exception {
+	public void updateMessageFailureNullMessageTest() throws MessageNotFoundException, Exception {
 		// creating and saving a message
 		String msg = "This world is awesome";
 		Message message = new Message(msg);

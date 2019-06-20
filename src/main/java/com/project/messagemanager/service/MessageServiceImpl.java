@@ -63,7 +63,7 @@ public class MessageServiceImpl implements MessageService {
 				logger.info("Found message!");
 			}
 		} catch(NoSuchElementException ex) {
-			logger.error("MessageNot found! "+ex);
+			logger.error("Message Not found! "+ex);
 			throw new MessageNotFoundException();
 		}
 		return message;
@@ -79,8 +79,8 @@ public class MessageServiceImpl implements MessageService {
 			throw new EmptyMessageException();
 		}
 		
-		Message createdMessage = messageRepository.save(message);	
-		logger.info("Created message!");
+		Message createdMessage = messageRepository.saveAndFlush(message);	
+		logger.info("Created message: "+createdMessage);
 		return createdMessage;
 	}
 
@@ -88,16 +88,16 @@ public class MessageServiceImpl implements MessageService {
 	@Override
 	public Message updateMessage(Message updatedMessage) throws MessageNotFoundException, EmptyMessageException {
 		logger.info("Updating message...");
-		this.validateId(updatedMessage.getId());
 		
 		// just for validation
 		if(updatedMessage.getMessage() == null || updatedMessage.getMessage().isEmpty()) {
 			logger.error("Message is null");
 			throw new EmptyMessageException();
 		}
+		this.getMessage(updatedMessage.getId()); // checks if the message exists
 		
-		updatedMessage = messageRepository.save(updatedMessage);
-		logger.info("Updated message!");
+		updatedMessage = messageRepository.saveAndFlush(updatedMessage);
+		logger.info("Updated message: "+updatedMessage);
 		return updatedMessage;
 	}
 
@@ -106,13 +106,7 @@ public class MessageServiceImpl implements MessageService {
 	public void deleteMessage(Integer id) throws MessageNotFoundException, InvalidIdException {
 		logger.info("Deleting message...");
 		// just for validation
-		this.validateId(id);
-		Message message = this.getMessage(id);
-		
-		if(message == null) {
-			logger.error("Message is null");
-			throw new MessageNotFoundException();
-		}
+		this.getMessage(id);
 		
 		messageRepository.deleteById(id);
 		logger.info("Deleted message!");

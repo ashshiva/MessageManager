@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-//import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.List;
@@ -16,11 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import com.project.messagemanager.entity.Message;
 import com.project.messagemanager.exceptions.EmptyMessageException;
@@ -62,7 +57,7 @@ public class MessageServiceTest {
 	}
     
     @Test
-	public void getMessageSuccessTest() throws Exception {
+	public void getMessageSuccessTest() throws Exception, MessageNotFoundException {
 		Message message = new Message("alexa");
 		Optional<Message> opMessage = Optional.of(message);
 	    when(messageRepository.findById(1)).thenReturn(opMessage);
@@ -72,35 +67,21 @@ public class MessageServiceTest {
 	    assertEquals(message.getMessage(), respMessage.getMessage());
 	}
     
-    @Test
-	public void getMessageNullIdTest() throws Exception {
-		Message message = new Message("alexa");
-		Optional<Message> opMessage = Optional.of(message);
-	    when(messageRepository.findById(1)).thenReturn(opMessage);
-	    try {
-	    	Message respMessage = messageService.getMessage(null);
-	    } catch(Exception ex) {
-	    	assertTrue(ex instanceof InvalidIdException);
-	    }
+    @Test(expected = InvalidIdException.class)
+	public void getMessageNullIdTest() throws Exception, MessageNotFoundException {
+	    messageService.getMessage(null);
 	}
     
-    @Test
-   	public void getMessageInvalidIdTest() throws Exception {
-   		Message message = new Message("alexa");
-   		Optional<Message> opMessage = Optional.of(message);
-   	    when(messageRepository.findById(1)).thenReturn(opMessage);
-   	    try {
-   	    	Message respMessage = messageService.getMessage(-5);
-   	    } catch(Exception ex) {
-   	    	assertTrue(ex instanceof InvalidIdException);
-   	    }
+    @Test(expected = InvalidIdException.class)
+   	public void getMessageInvalidIdTest() throws Exception, MessageNotFoundException {
+   	    messageService.getMessage(-5);
    	}
     
     @Test
     public void createMessageSuccessTest() throws EmptyMessageException {
     	Message message = new Message("google");
     	
-    	when(messageRepository.save(message)).thenReturn(message);
+    	when(messageRepository.saveAndFlush(message)).thenReturn(message);
     	Message respMessage = messageService.saveMessage(message);
     	
     	assertEquals(message.getMessage(), respMessage.getMessage());
@@ -112,112 +93,94 @@ public class MessageServiceTest {
     public void createMessagePalindromeTest() throws EmptyMessageException {
     	Message message = new Message("google");
     	
-    	when(messageRepository.save(message)).thenReturn(message);
+    	when(messageRepository.saveAndFlush(message)).thenReturn(message);
     	Message respMessage = messageService.saveMessage(message);
     	
     	assertEquals(message.getMessage(), respMessage.getMessage());
     	assertEquals(message.getId(), respMessage.getId());
     	assertNotNull(message.isPalindrome());
     	assertFalse(message.isPalindrome());
+    	  	
+    	message = new Message("madam");
     	
-    	message = new Message("Never Odd Or Even");
-    	
-    	when(messageRepository.save(message)).thenReturn(message);
+    	when(messageRepository.saveAndFlush(message)).thenReturn(message);
     	respMessage = messageService.saveMessage(message);
     	
     	assertEquals(message.getMessage(), respMessage.getMessage());
     	assertEquals(message.getId(), respMessage.getId());
     	assertNotNull(message.isPalindrome());
     	assertTrue(message.isPalindrome());
+    	
+    	message = new Message("Never Odd Or Even");
+    	
+    	when(messageRepository.saveAndFlush(message)).thenReturn(message);
+    	respMessage = messageService.saveMessage(message);
+    	
+    	assertEquals(message.getMessage(), respMessage.getMessage());
+    	assertEquals(message.getId(), respMessage.getId());
+    	assertNotNull(message.isPalindrome());
+    	assertTrue(message.isPalindrome());
+    	
+    	message = new Message("hello world");
+    	
+    	when(messageRepository.saveAndFlush(message)).thenReturn(message);
+    	respMessage = messageService.saveMessage(message);
+    	
+    	assertEquals(message.getMessage(), respMessage.getMessage());
+    	assertEquals(message.getId(), respMessage.getId());
+    	assertNotNull(message.isPalindrome());
+    	assertFalse(message.isPalindrome());
     }
     
-    @Test
+    @Test(expected = EmptyMessageException.class)
     public void createMessageNullMessageTest() throws EmptyMessageException {
     	Message message = new Message(null);
-    	
-    	when(messageRepository.save(message)).thenReturn(message);
-    	try {
-    		Message respMessage = messageService.saveMessage(message);
-    	}catch(Exception ex) {
-    	assertTrue(ex instanceof EmptyMessageException);	
-    	}
+    		messageService.saveMessage(message);
     }
     
     @Test
     public void updateMessageSuccessTest() throws EmptyMessageException, MessageNotFoundException {
     	Message message = new Message("google");
-    	message.setId(2);
-    	
-    	// create a message
-    	when(messageRepository.save(message)).thenReturn(message);
-    	Message respMessage = messageService.saveMessage(message);
-    	
-    	assertEquals(message.getMessage(), respMessage.getMessage());
-    	assertEquals(message.getId(), respMessage.getId());
-    	
+    	message.setId(2);    	
     	message.setMessage("alexa");
-    	Message updatedMessage = message;
     	
+    	Optional<Message> opMessage = Optional.of(message);
+	    when(messageRepository.findById(2)).thenReturn(opMessage);
     	// update the message
-    	when(messageRepository.save(message)).thenReturn(message);
-    	respMessage = messageService.updateMessage(updatedMessage);
-    	
-    	assertEquals(updatedMessage.getMessage(), respMessage.getMessage());
-    	assertEquals(updatedMessage.getId(), respMessage.getId());
-    }
-    
-    @Test
-    public void updateMessageNullMessageTest() throws EmptyMessageException, MessageNotFoundException {
-    	Message message = new Message("google");
-    	message.setId(2);
-    	
-    	// create a message
-    	when(messageRepository.save(message)).thenReturn(message);
-    	Message respMessage = messageService.saveMessage(message);
+    	when(messageRepository.saveAndFlush(message)).thenReturn(message);
+    	Message respMessage = messageService.updateMessage(message);
     	
     	assertEquals(message.getMessage(), respMessage.getMessage());
     	assertEquals(message.getId(), respMessage.getId());
-    	
-    	message.setMessage(null);
-    	Message updatedMessage = message;
-    	
-    	// update the message
-    	when(messageRepository.save(message)).thenReturn(message);
-    	try {
-    	respMessage = messageService.updateMessage(updatedMessage);
-    	} catch(Exception ex) {
-    		assertTrue(ex instanceof EmptyMessageException);
-    	}	
     }
     
-    @Test
+    @Test(expected = EmptyMessageException.class)
+    public void updateMessageNullMessageTest() throws EmptyMessageException, MessageNotFoundException {
+    	Message message = new Message(null);
+    	message.setId(2);
+    	
+    	// update the message
+    		messageService.updateMessage(message);
+    }
+    
+    @Test(expected = InvalidIdException.class)
     public void updateMessageInvalidMessageIdTest() throws EmptyMessageException, MessageNotFoundException {
     	Message message = new Message("google");
-    	message.setId(2);
     	
-    	// create a message
-    	when(messageRepository.save(message)).thenReturn(message);
-    	Message respMessage = messageService.saveMessage(message);
-    	
-    	assertEquals(message.getMessage(), respMessage.getMessage());
-    	assertEquals(message.getId(), respMessage.getId());
-    	
-    	message.setMessage("google");
-    	message.setId(5);
-    	Message updatedMessage = message;
-    	
-    	// update the message
-    	when(messageRepository.save(message)).thenReturn(message);
-    	try {
-    	respMessage = messageService.updateMessage(updatedMessage);
-    	} catch(Exception ex) {
-    		assertTrue(ex instanceof InvalidIdException);
-    	}
+    	messageService.updateMessage(message);
     	
     }
     
+    @Test(expected = MessageNotFoundException.class)
+    public void updateMessageNonExistentMessageTest() throws EmptyMessageException, MessageNotFoundException {
+    	Message message = new Message("hello");
+    	message.setId(2);
+		when(messageRepository.findById(2)).thenThrow(MessageNotFoundException.class);
+		messageService.updateMessage(message);
+    }
+    
     @Test
-    public void deleteMessageSuccessTest() throws Exception {
+    public void deleteMessageSuccessTest() throws MessageNotFoundException {
     	Message message = new Message("google");
     	message.setId(2);
     	
@@ -227,34 +190,20 @@ public class MessageServiceTest {
     	messageService.deleteMessage(2);
     }
     
-    @Test
-    public void deleteMessageNonExistentMessageTest() throws Exception {
-    	Message message = new Message("google");
-    	message.setId(2);
-    	
-    	Optional<Message> opMessage = Optional.of(message);
-	    when(messageRepository.findById(2)).thenReturn(opMessage);
-    	doNothing().when(messageRepository).deleteById(message.getId());
-    	try {
-    	messageService.deleteMessage(5);
-    	} catch(Exception ex) {
-    		assertTrue(ex instanceof MessageNotFoundException);
-    	}
+    @Test(expected = InvalidIdException.class)
+    public void deleteMessageInvalidIDMessageTest() throws MessageNotFoundException {
+		messageService.deleteMessage(-1);
     }
     
-    @Test
-    public void deleteMessageNullIdTest() throws Exception {
-    	Message message = new Message("google");
-    	message.setId(2);
-    	
-    	Optional<Message> opMessage = Optional.of(message);
-	    when(messageRepository.findById(2)).thenReturn(opMessage);
-    	doNothing().when(messageRepository).deleteById(message.getId());
-    	try {
+    @Test(expected = InvalidIdException.class)
+    public void deleteMessageNullIdTest() throws InvalidIdException, MessageNotFoundException {
     	messageService.deleteMessage(null);
-    	} catch(Exception ex) {
-    		assertTrue(ex instanceof InvalidIdException);
-    	}
+    }
+    
+    @Test(expected = MessageNotFoundException.class)
+    public void deleteMessageNonExistentMessageTest() throws MessageNotFoundException {
+		when(messageRepository.findById(2)).thenThrow(MessageNotFoundException.class);
+		messageService.deleteMessage(2);
     }
 
 }

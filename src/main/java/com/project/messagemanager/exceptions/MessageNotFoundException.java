@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 */
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Message is not found")
-public class MessageNotFoundException extends Exception {
+public class MessageNotFoundException extends RuntimeException {
 	
 	private static final long serialVersionUID = 105896412374152L;
 }
