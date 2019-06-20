@@ -4,16 +4,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.DuplicateMessageException;
 import com.project.messagemanager.exceptions.EmptyMessageException;
 import com.project.messagemanager.exceptions.InvalidIdException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
@@ -71,22 +69,25 @@ public class MessageServiceImpl implements MessageService {
 
 	// Create a message
 	@Override
-	public Message saveMessage(Message message) throws EmptyMessageException {
+	public Message saveMessage(Message message) throws EmptyMessageException, DuplicateMessageException {
 		logger.info("Creating message...");
 		
 		if(message == null || message.getMessage() == null || message.getMessage().trim().isEmpty()) {
 			logger.error("Message is null");
 			throw new EmptyMessageException();
 		}
-		
-		Message createdMessage = messageRepository.saveAndFlush(message);	
-		logger.info("Created message: "+createdMessage);
-		return createdMessage;
+		try {
+			Message createdMessage = messageRepository.saveAndFlush(message);	
+			logger.info("Created message: "+createdMessage);
+			return createdMessage;
+		} catch(DataIntegrityViolationException ex) {
+			throw new DuplicateMessageException();
+		}
 	}
 
 	// Update a message
 	@Override
-	public Message updateMessage(Message updatedMessage) throws MessageNotFoundException, EmptyMessageException {
+	public Message updateMessage(Message updatedMessage) throws MessageNotFoundException, DuplicateMessageException, EmptyMessageException {
 		logger.info("Updating message...");
 		
 		// just for validation
@@ -95,10 +96,13 @@ public class MessageServiceImpl implements MessageService {
 			throw new EmptyMessageException();
 		}
 		this.getMessage(updatedMessage.getId()); // checks if the message exists
-		
-		updatedMessage = messageRepository.saveAndFlush(updatedMessage);
-		logger.info("Updated message: "+updatedMessage);
-		return updatedMessage;
+		try {
+			updatedMessage = messageRepository.saveAndFlush(updatedMessage);
+			logger.info("Updated message: "+updatedMessage);
+			return updatedMessage;
+		} catch(DataIntegrityViolationException ex) {
+			throw new DuplicateMessageException();
+		}
 	}
 
 	// Delete a message

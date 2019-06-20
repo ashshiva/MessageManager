@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.DuplicateMessageException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.service.MessageService;
 
@@ -93,6 +94,26 @@ public class MessageControllerTest {
 	      .andExpect(jsonPath("$.id", is(message.getId())))
 	      .andExpect(jsonPath("$.message", is(msg)));
 	}
+	
+	@Test
+	public void createDuplicateMessageTest() throws DuplicateMessageException, Exception {
+		String msg = "hellohello";
+		Message message = new Message(msg);
+		message.setId(5);
+		when(service.saveMessage(any())).thenReturn(message);
+		mvc.perform(post("/api/v1/messages")
+				.content(marshalMessage(message))
+				.contentType(MediaType.APPLICATION_JSON))
+	      .andExpect(status().isCreated());
+		
+		message = new Message(msg);
+		message.setId(15);
+		when(service.saveMessage(any())).thenThrow(DuplicateMessageException.class);
+		mvc.perform(post("/api/v1/messages")
+				.content(marshalMessage(message))
+				.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isConflict());
+	}
 
 	@Test
 	public void createMessageFailureTest() throws Exception {
@@ -103,6 +124,17 @@ public class MessageControllerTest {
 				.content(marshalMessage(message))
 				.contentType(MediaType.APPLICATION_JSON))
 	      .andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void createMessageFailureUniqueMessageTest() throws Exception {
+		Message message = new Message("madam");
+		message.setId(5);
+		when(service.saveMessage(any())).thenThrow(DuplicateMessageException.class);
+		mvc.perform(post("/api/v1/messages")
+				.content(marshalMessage(message))
+				.contentType(MediaType.APPLICATION_JSON))
+	      .andExpect(status().isConflict());
 	}
 	
 
@@ -203,6 +235,30 @@ public class MessageControllerTest {
 				.content(marshalMessage(updatedMessage)))
 	      .andExpect(status().isBadRequest());
 	}
+	
+	public void updateMessageDuplicateMessageTest() throws MessageNotFoundException, DuplicateMessageException, Exception {
+		// creating and saving a message
+		String msg = "This world is awesome";
+		Message message = new Message(msg);
+		message.setId(5);
+		when(service.saveMessage(any())).thenReturn(message);
+		mvc.perform(post("/api/v1/messages")
+				.content(marshalMessage(message))
+				.contentType(MediaType.APPLICATION_JSON))
+	      .andExpect(status().isCreated())
+	      .andExpect(jsonPath("$.id", is(message.getId())))
+	      .andExpect(jsonPath("$.message", is(msg)));
+		
+		// updating the message we created above
+		Message updatedMessage = new Message(msg);
+		updatedMessage.setId(5);
+		when(service.updateMessage(any())).thenThrow(DuplicateMessageException.class);
+		mvc.perform(put("/api/v1/messages/{messageId}", 15)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(marshalMessage(updatedMessage)))
+	      .andExpect(status().isConflict());
+	}
+	
 	
 	
 	private String marshalMessage(Message msg) {

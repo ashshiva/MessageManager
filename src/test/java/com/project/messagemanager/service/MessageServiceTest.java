@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.DuplicateMessageException;
 import com.project.messagemanager.exceptions.EmptyMessageException;
 import com.project.messagemanager.exceptions.InvalidIdException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
@@ -132,6 +133,14 @@ public class MessageServiceTest {
     	assertFalse(message.isPalindrome());
     }
     
+    @Test(expected= DuplicateMessageException.class)
+    public void createDuplicateMessageTest() throws EmptyMessageException {
+    	Message message = new Message("google");
+    	
+    	when(messageRepository.saveAndFlush(message)).thenThrow(DuplicateMessageException.class);
+    	Message respMessage = messageService.saveMessage(message);
+    }
+    
     @Test(expected = EmptyMessageException.class)
     public void createMessageNullMessageTest() throws EmptyMessageException {
     	Message message = new Message(null);
@@ -177,6 +186,19 @@ public class MessageServiceTest {
     	message.setId(2);
 		when(messageRepository.findById(2)).thenThrow(MessageNotFoundException.class);
 		messageService.updateMessage(message);
+    }
+    
+    @Test(expected = DuplicateMessageException.class)
+    public void updateMessageDuplicateMessageTest() throws EmptyMessageException, MessageNotFoundException {
+    	Message message = new Message("google");
+    	message.setId(2);    	
+    	message.setMessage("alexa");
+    	
+    	Optional<Message> opMessage = Optional.of(message);
+	    when(messageRepository.findById(2)).thenReturn(opMessage);
+    	// update the message
+    	when(messageRepository.saveAndFlush(message)).thenThrow(DuplicateMessageException.class);
+    	Message respMessage = messageService.updateMessage(message);
     }
     
     @Test

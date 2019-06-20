@@ -143,6 +143,15 @@ If you want to give it a try, you can do so by running:
 ```sh
 docker pull ashwathisshiva/messagemanager
 ```
+
+## Custom Exceptions
+
+- DuplicateMessageException - thrown when a duplicate mesaage is supplied during create and update operations.
+- MessageNotFoundException - thrown when a message is not found in the database in the get specific message and delete operations.
+- InvalidIdException - thrown when the id specified is null or negative get specific message and delete operations.
+- EmptyMessageException - thrown when a supplied message is null or empty during create and update operations.
+- UnknownException - Any other exceptions that might arise during runtime.
+
 ## Future Action items
 - Support MySQL / PostgreSQL for long-term storage
 - bring in migration strategies to manage schema changes using a system like liquibase

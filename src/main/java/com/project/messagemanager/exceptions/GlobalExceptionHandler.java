@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,5 +57,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(ConstraintViolationException.class)
     public void constraintViolationException(HttpServletResponse response) throws IOException {
         response.sendError(HttpStatus.BAD_REQUEST.value());
+    }
+    
+    @ExceptionHandler( DataIntegrityViolationException.class)
+    public void dataIntegrityViolationException(HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.CONFLICT.value());
     }
 }

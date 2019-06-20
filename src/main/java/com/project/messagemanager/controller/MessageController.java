@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.DuplicateMessageException;
 import com.project.messagemanager.exceptions.EmptyMessageException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.exceptions.UnknownException;
@@ -80,8 +81,7 @@ public class MessageController {
 				throw new MessageNotFoundException();
 			return new ResponseEntity<Message>(message, HttpStatus.OK);
 		} catch(MessageNotFoundException ex) {
-			logger.error("MessageNotFoundException occurred: "+ex);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);		
+			throw ex;		
 		} catch(Exception ex) {
 			logger.error("An unknown exception occurred: "+ex);
 			throw new UnknownException();
@@ -103,9 +103,8 @@ public class MessageController {
 			Message savedMessage = messageService.saveMessage(message);
 			logger.info("Message created!");
 			return new ResponseEntity<Message>(savedMessage, HttpStatus.CREATED);
-		} catch(EmptyMessageException ex) {
-			logger.error("Message is null! "+ex);
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch(EmptyMessageException | DuplicateMessageException ex) {
+			throw ex;
 		} catch(Exception ex) {
 			logger.error("An unknown exception occurred: "+ex);
 			throw new UnknownException();
@@ -133,13 +132,12 @@ public class MessageController {
 			Message updatedMessage = messageService.updateMessage(message);	
 			logger.info("Message Updated!");
 			return new ResponseEntity<Message>(updatedMessage, HttpStatus.OK);
-		} catch(MessageNotFoundException ex) {
-			logger.error("Message not found: "+ex);
-			return new ResponseEntity<Message>(HttpStatus.NOT_FOUND);		
-		} catch(EmptyMessageException ex) {
-			logger.error("Message is null/blank: "+ex);
-			return new ResponseEntity<Message>(HttpStatus.BAD_REQUEST);	
-		}catch(Exception ex) {
+		} catch(MessageNotFoundException | EmptyMessageException ex) {
+			throw ex;	
+		} catch(DuplicateMessageException ex) {
+			logger.error("Duplicate messages not allowed: "+ex);
+			return new ResponseEntity<Message>(HttpStatus.CONFLICT);
+		} catch(Exception ex) {
 			logger.error("An unknown exception occurred: "+ex);
 			throw new UnknownException();
 		}
@@ -158,11 +156,10 @@ public class MessageController {
 			logger.info("Message deleted!");
 			return new ResponseEntity<Message>(HttpStatus.OK);
 		} catch(MessageNotFoundException ex) {
-			logger.error("Message not found: "+ex);
-			return new ResponseEntity<Message>(HttpStatus.NOT_FOUND);			
-		} catch(ConstraintViolationException ex) {
-			logger.error("Invalid message id supplied: "+ex);
-			return new ResponseEntity<Message>(HttpStatus.BAD_REQUEST);
+			throw ex;		
+//		} catch(ConstraintViolationException ex) {
+//			logger.error("Invalid message id supplied: "+ex);
+//			return new ResponseEntity<Message>(HttpStatus.BAD_REQUEST);
 		} catch(Exception ex) {
 			logger.error("An unknown exception occurred: ",ex);
 			throw new UnknownException();

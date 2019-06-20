@@ -25,7 +25,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.project.messagemanager.controller.MessageController;
 import com.project.messagemanager.entity.Message;
+import com.project.messagemanager.exceptions.DuplicateMessageException;
 import com.project.messagemanager.exceptions.EmptyMessageException;
+import com.project.messagemanager.exceptions.InvalidIdException;
+import com.project.messagemanager.exceptions.MessageNotFoundException;
 
 /**
 * @author  Ashwathi SShiva
@@ -158,7 +161,7 @@ public class MessageControllerIT {
 			assertEquals(HttpStatus.OK, response.getStatusCode());
 		}
 	
-	  @Test
+	  @Test(expected = MessageNotFoundException.class)
 	  public void testDeleteMessageIncorrectId() throws URISyntaxException, MethodArgumentNotValidException {
 		  ResponseEntity<Message> response = null;
 			Message message = new Message("delete");
@@ -169,6 +172,5 @@ public class MessageControllerIT {
 			assertEquals(HttpStatus.CREATED, response.getStatusCode());
 			
 			response = (ResponseEntity<Message>) messageController.deleteMessage(500);
-			assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		}
 }

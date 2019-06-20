@@ -90,6 +90,8 @@ create() {
         echo "Created At: $(echo $msg | jq -r '.createdAt')"
     elif [ $resp_code == 400 ]; then
         echo "Unable to create the message. Please check the provided message."
+    elif [ $resp_code == 409 ]; then
+        echo "Duplicate messages not allowed. Please supply a different message."
     else 
         echo "Unable to create the message. Please try again later."
     fi
@@ -121,6 +123,8 @@ update() {
         echo "Unable to update the message. Please check the provided id and message."
     elif [ $resp_code == 404 ]; then
         echo "Message with the given id could not be found."
+    elif [ $resp_code == 409 ]; then
+        echo "Duplicate messages not allowed. Please supply a different message."
     else 
         echo "Unable to update the message. Please try again later."
     fi
