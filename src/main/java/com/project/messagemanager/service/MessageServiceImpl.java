@@ -20,6 +20,11 @@ import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.exceptions.UnknownException;
 import com.project.messagemanager.repository.MessageRepository;
 
+/**
+* @author  Ashwathi SShiva
+* 
+*/
+
 @Service
 public class MessageServiceImpl implements MessageService {
 
@@ -30,6 +35,7 @@ public class MessageServiceImpl implements MessageService {
 	
 	private static final Logger logger = LogManager.getLogger(MessageServiceImpl.class);
 	
+	// Retrieve all messages
 	@Override
 	public List<Message> retrieveAllMessages() throws Exception {
 		List<Message> messages = null;
@@ -44,6 +50,7 @@ public class MessageServiceImpl implements MessageService {
 		return messages;
 	}
 
+	// Retrieve a specific message
 	@Override
 	public Message getMessage(Integer id) throws MessageNotFoundException {
 		logger.info("Finding message..");
@@ -62,6 +69,7 @@ public class MessageServiceImpl implements MessageService {
 		return message;
 	}
 
+	// Create a message
 	@Override
 	public Message saveMessage(Message message) throws EmptyMessageException {
 		logger.info("Creating message...");
@@ -76,6 +84,7 @@ public class MessageServiceImpl implements MessageService {
 		return createdMessage;
 	}
 
+	// Update a message
 	@Override
 	public Message updateMessage(Message updatedMessage) throws MessageNotFoundException, EmptyMessageException {
 		logger.info("Updating message...");
@@ -92,6 +101,7 @@ public class MessageServiceImpl implements MessageService {
 		return updatedMessage;
 	}
 
+	// Delete a message
 	@Override
 	public void deleteMessage(Integer id) throws MessageNotFoundException, InvalidIdException {
 		logger.info("Deleting message...");
@@ -108,6 +118,7 @@ public class MessageServiceImpl implements MessageService {
 		logger.info("Deleted message!");
 	}
 	
+	// Validate the Id of a message
 	public void validateId(Integer id) throws InvalidIdException {
 		if(id == null || id <= 0) { 
 			logger.error("Message id is either null or negative");

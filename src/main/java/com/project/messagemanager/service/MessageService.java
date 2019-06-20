@@ -11,9 +11,10 @@ import com.project.messagemanager.exceptions.InvalidIdException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
 
 /**
- * @author ashwathi
- *
- */
+* @author  Ashwathi SShiva
+* 
+*/
+
 public interface MessageService {
 
 	public List<Message> retrieveAllMessages()throws Exception;

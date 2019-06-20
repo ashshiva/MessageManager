@@ -26,6 +26,12 @@ import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.exceptions.UnknownException;
 import com.project.messagemanager.service.MessageService;
 
+
+/**
+* @author  Ashwathi SShiva
+* 
+*/
+
 @RestController
 @Validated
 public class MessageController {
@@ -40,7 +46,7 @@ public class MessageController {
 		this.messageService = messageService;
 	}
 
-	
+	// Retrieve all available messages
 	@RequestMapping(
 			value = "/api/v1/messages", 
 			method=RequestMethod.GET,
@@ -58,6 +64,7 @@ public class MessageController {
 		}
 	}
 	
+	// Retrieve a specific message
 	@RequestMapping(
 			value = "/api/v1/messages/{messageId}", 
 			method=RequestMethod.GET,
@@ -81,6 +88,7 @@ public class MessageController {
 		}
 	}
 	
+	// Create a Message
 	@RequestMapping(
 			value = "/api/v1/messages", 
 			method=RequestMethod.POST,
@@ -105,6 +113,7 @@ public class MessageController {
 		
 	}
 	
+	// Update a message
 	@RequestMapping(
 			value = "api/v1/messages/{messageId}", 
 			method=RequestMethod.PUT,
@@ -136,6 +145,7 @@ public class MessageController {
 		}
 	}
 	
+	// Delete a message
 	@RequestMapping(
 			value = "api/v1/messages/{messageId}", 
 			method=RequestMethod.DELETE

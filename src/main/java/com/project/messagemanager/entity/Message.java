@@ -18,6 +18,12 @@ import org.springframework.util.StringUtils;
 
 import com.project.messagemanager.exceptions.EmptyMessageException;
 
+
+/**
+* @author  Ashwathi SShiva
+* 
+*/
+
 @Entity
 @Table(name="MESSAGE")
 public class Message {

@@ -5,6 +5,11 @@ import org.springframework.stereotype.Repository;
 
 import com.project.messagemanager.entity.Message;
 
+/**
+* @author  Ashwathi SShiva
+* 
+*/
+
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer>{
 

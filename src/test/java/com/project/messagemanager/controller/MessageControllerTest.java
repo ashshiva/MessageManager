@@ -28,6 +28,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.messagemanager.entity.Message;
 import com.project.messagemanager.service.MessageService;
 
+/**
+* @author  Ashwathi SShiva
+* 
+*/
+
 @AutoConfigureMockMvc
 @WebMvcTest(MessageController.class)
 @RunWith(SpringRunner.class)

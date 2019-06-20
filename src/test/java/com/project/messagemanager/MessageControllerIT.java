@@ -31,6 +31,10 @@ import com.project.messagemanager.entity.Message;
 import com.project.messagemanager.exceptions.EmptyMessageException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
 
+/**
+* @author  Ashwathi SShiva
+* 
+*/
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -146,6 +150,7 @@ public class MessageControllerIT {
 		}
 	}
 
+	// PUT test
 	@SuppressWarnings("unchecked")
 	@Test
     public void testUpdateMessage() throws URISyntaxException {
@@ -204,6 +209,7 @@ public class MessageControllerIT {
 			}
 	}
 
+	// DELETE test
 	  @Test
 	  public void testDeleteMessage() throws URISyntaxException, MethodArgumentNotValidException {
 			ResponseEntity<Message> response = null;

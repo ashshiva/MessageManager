@@ -3,6 +3,11 @@ package com.project.messagemanager.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+/**
+* @author  Ashwathi SShiva
+* 
+*/
+
 @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "There was an error processing the request. Please try again later.")
 public class UnknownException extends RuntimeException {
    

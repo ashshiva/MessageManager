@@ -28,6 +28,11 @@ import com.project.messagemanager.exceptions.InvalidIdException;
 import com.project.messagemanager.exceptions.MessageNotFoundException;
 import com.project.messagemanager.repository.MessageRepository;
 
+/**
+* @author  Ashwathi SShiva
+* 
+*/
+
 @RunWith(SpringRunner.class)
 public class MessageServiceTest {
 		
