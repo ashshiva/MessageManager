@@ -1,7 +1,7 @@
 # MessageManager
 
 ## About this project
-MessageManager is an application that manages messages and provides details about them. More specifically it tells you if a message is a palindrome or not, in addition to when the message was created and/or updated. The application provides REST API endpoints to create, update, retrieve, delete a message and list all available messages. 
+MessageManager is an application that manages messages and provides details about them. More specifically it tells you if a message is a palindrome or not, in addition to when the message was created and/or updated. The application provides REST API endpoints to create, update, retrieve, delete a message and list all available messages. The messages have to be unique, which is checked before saving or updating them. 
 
 This application is implemented in Java as a Spring Boot application.
 
